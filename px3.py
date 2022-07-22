@@ -1,12 +1,19 @@
-import socket, threading, _thread, select, signal, sys, time, getopt
+import socket
+import threading
+import _thread
+import select
+import signal
+import sys
+import time
+import getopt
 
 # Listen
 LISTENING_ADDR = '0.0.0.0'
 if sys.argv[1:]:
-  LISTENING_PORT = sys.argv[1]
+    LISTENING_PORT = sys.argv[1]
 else:
-  LISTENING_PORT = 8022
-#Pass
+    LISTENING_PORT = 8022
+# Pass
 PASS = ''
 
 # CONST
@@ -14,7 +21,8 @@ BUFLEN = 4096 * 4
 TIMEOUT = 60
 DEFAULT_HOST = '127.0.0.1:143'
 RESPONSE = 'HTTP/1.1 101 Switching Protocols\r\n\r\n'
-#RESPONSE = 'HTTP/1.1 200 Hello_World!\r\nContent-length: 0\r\n\r\nHTTP/1.1 200 Connection established\r\n\r\n'  # lint:ok
+# RESPONSE = 'HTTP/1.1 200 Hello_World!\r\nContent-length: 0\r\n\r\nHTTP/1.1 200 Connection established\r\n\r\n'  # lint:ok
+
 
 class Server(threading.Thread):
     def __init__(self, host, port):
@@ -115,7 +123,8 @@ class ConnectionHandler(threading.Thread):
         try:
             self.client_buffer = self.client.recv(BUFLEN)
 
-            hostPort = self.findHeader(self.client_buffer.decode(), 'X-Real-Host')
+            hostPort = self.findHeader(
+                self.client_buffer.decode(), 'X-Real-Host')
 
             if hostPort == '':
                 hostPort = DEFAULT_HOST
@@ -161,7 +170,7 @@ class ConnectionHandler(threading.Thread):
         if aux == -1:
             return ''
 
-        return head[:aux];
+        return head[:aux]
 
     def connect_target(self, host):
         i = host.find(':')
@@ -169,12 +178,13 @@ class ConnectionHandler(threading.Thread):
             port = int(host[i+1:])
             host = host[:i]
         else:
-            if self.method=='CONNECT':
+            if self.method == 'CONNECT':
                 port = 443
             else:
                 port = sys.argv[1]
 
-        (soc_family, soc_type, proto, _, address) = socket.getaddrinfo(host, port)[0]
+        (soc_family, soc_type, proto, _,
+         address) = socket.getaddrinfo(host, port)[0]
 
         self.target = socket.socket(soc_family, soc_type, proto)
         self.targetClosed = False
@@ -228,12 +238,13 @@ def print_usage():
     print('       proxy.py -b <bindAddr> -p <port>')
     print('       proxy.py -b 0.0.0.0 -p 80')
 
+
 def parse_args(argv):
     global LISTENING_ADDR
     global LISTENING_PORT
 
     try:
-        opts, args = getopt.getopt(argv,"hb:p:",["bind=","port="])
+        opts, args = getopt.getopt(argv, "hb:p:", ["bind=", "port="])
     except getopt.GetoptError:
         print_usage()
         sys.exit(2)
@@ -262,6 +273,7 @@ def main(host=LISTENING_ADDR, port=LISTENING_PORT):
             server.close()
             break
 
-#######    parse_args(sys.argv[1:])
+
+# parse_args(sys.argv[1:])
 if __name__ == '__main__':
     main()
